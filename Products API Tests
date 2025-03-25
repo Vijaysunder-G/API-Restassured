@@ -1,0 +1,67 @@
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import java.util.List;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+public class ProductsAPITests extends BaseAPITest {
+
+    @Test
+    public void testGetAllProducts() {
+        Response response = given()
+                .spec(requestSpec)
+            .when()
+                .get("/products")
+            .then()
+                .statusCode(200)
+                .body("size()", greaterThan(0))
+                .extract().response();
+        
+        List<Product> products = response.jsonPath().getList("", Product.class);
+        products.forEach(product -> {
+            assert product.getId() != null;
+            assert product.getTitle() != null;
+            assert product.getPrice() != null;
+        });
+    }
+
+    @Test
+    public void testGetSingleProduct() {
+        int productId = 1;
+        
+        given()
+            .spec(requestSpec)
+        .when()
+            .get("/products/" + productId)
+        .then()
+            .statusCode(200)
+            .body("id", equalTo(productId))
+            .body("title", not(emptyString()))
+            .body("price", greaterThan(0));
+    }
+
+    @Test
+    public void testAddNewProduct() {
+        Product newProduct = new Product();
+        newProduct.setTitle("Test Product");
+        newProduct.setPrice(13.5);
+        newProduct.setDescription("Test Description");
+        newProduct.setCategory("Test Category");
+        newProduct.setImage("https://testimage.com");
+        
+        Product.Rating rating = new Product.Rating();
+        rating.setRate(4.5);
+        rating.setCount(120);
+        newProduct.setRating(rating);
+        
+        given()
+            .spec(requestSpec)
+            .body(newProduct)
+        .when()
+            .post("/products")
+        .then()
+            .statusCode(200)
+            .body("id", notNullValue())
+            .body("title", equalTo(newProduct.getTitle()));
+    }
+}
