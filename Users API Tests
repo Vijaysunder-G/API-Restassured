@@ -1,0 +1,75 @@
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+public class UsersAPITests extends BaseAPITest {
+
+    @Test
+    public void testUserLogin() {
+        String requestBody = "{"
+                + "\"username\": \"johnd\","
+                + "\"password\": \"m38rmF$\""
+                + "}";
+        
+        given()
+            .spec(requestSpec)
+            .body(requestBody)
+        .when()
+            .post("/auth/login")
+        .then()
+            .statusCode(200)
+            .body("token", not(emptyString()));
+    }
+
+    @Test
+    public void testGetUser() {
+        int userId = 1;
+        
+        given()
+            .spec(requestSpec)
+        .when()
+            .get("/users/" + userId)
+        .then()
+            .statusCode(200)
+            .body("id", equalTo(userId))
+            .body("username", equalTo("johnd"))
+            .body("email", equalTo("john@gmail.com"));
+    }
+
+    @Test
+    public void testCreateUser() {
+        User newUser = new User();
+        newUser.setEmail("test@example.com");
+        newUser.setUsername("testuser");
+        newUser.setPassword("testpass123");
+        
+        User.Name name = new User.Name();
+        name.setFirstname("Test");
+        name.setLastname("User");
+        newUser.setName(name);
+        
+        User.Address address = new User.Address();
+        address.setCity("Test City");
+        address.setStreet("Test Street");
+        address.setNumber(123);
+        address.setZipcode("12345");
+        
+        User.Address.Geolocation geolocation = new User.Address.Geolocation();
+        geolocation.setLat("12.3456");
+        geolocation.set_long("-78.9012");
+        address.setGeolocation(geolocation);
+        
+        newUser.setAddress(address);
+        newUser.setPhone("1234567890");
+        
+        given()
+            .spec(requestSpec)
+            .body(newUser)
+        .when()
+            .post("/users")
+        .then()
+            .statusCode(200)
+            .body("id", notNullValue());
+    }
+}
