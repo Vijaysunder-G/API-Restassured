@@ -1,0 +1,16 @@
+import lombok.Data;
+import java.util.List;
+
+@Data
+public class Cart {
+    private Integer id;
+    private Integer userId;
+    private String date;
+    private List<Product> products;
+    
+    @Data
+    public static class Product {
+        private Integer productId;
+        private Integer quantity;
+    }
+}
