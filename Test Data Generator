@@ -1,0 +1,17 @@
+import java.util.Random;
+
+public class TestDataGenerator {
+    private static final Random random = new Random();
+    
+    public static String randomEmail() {
+        return "user" + random.nextInt(10000) + "@example.com";
+    }
+    
+    public static String randomUsername() {
+        return "user" + random.nextInt(10000);
+    }
+    
+    public static int randomQuantity() {
+        return random.nextInt(10) + 1;
+    }
+}
