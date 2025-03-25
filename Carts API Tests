@@ -1,0 +1,48 @@
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import java.util.Arrays;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+public class CartsAPITests extends BaseAPITest {
+
+    @Test
+    public void testGetUserCart() {
+        int userId = 1;
+        
+        given()
+            .spec(requestSpec)
+        .when()
+            .get("/carts/user/" + userId)
+        .then()
+            .statusCode(200)
+            .body("size()", greaterThan(0))
+            .body("[0].userId", equalTo(userId));
+    }
+
+    @Test
+    public void testAddProductToCart() {
+        Cart cart = new Cart();
+        cart.setUserId(1);
+        
+        Cart.Product product1 = new Cart.Product();
+        product1.setProductId(1);
+        product1.setQuantity(2);
+        
+        Cart.Product product2 = new Cart.Product();
+        product2.setProductId(2);
+        product2.setQuantity(1);
+        
+        cart.setProducts(Arrays.asList(product1, product2));
+        
+        given()
+            .spec(requestSpec)
+            .body(cart)
+        .when()
+            .post("/carts")
+        .then()
+            .statusCode(200)
+            .body("id", notNullValue())
+            .body("products.size()", equalTo(2));
+    }
+}
