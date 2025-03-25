@@ -1,0 +1,20 @@
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+
+public class APIRequestBuilder {
+    public static RequestSpecification getDefaultRequestSpec() {
+        return new RequestSpecBuilder()
+                .setContentType(ContentType.JSON)
+                .setAccept(ContentType.JSON)
+                .build();
+    }
+    
+    public static RequestSpecification getRequestSpecWithAuth(String token) {
+        return new RequestSpecBuilder()
+                .setContentType(ContentType.JSON)
+                .setAccept(ContentType.JSON)
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+    }
+}
